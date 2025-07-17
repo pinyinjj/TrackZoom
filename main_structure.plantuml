@@ -1,21 +1,36 @@
 @startuml main_structure
-class getPositionFromModel {
-    model : Model
-}
-entity frame
+
+entity Frame
+entity Model
+entity Position
+
+
+Handler o-- Frame : has
+Handler o-- Model : has
+Handler o-- Position : has
 
 abstract class Handler {
     + handle(result: String)
+    + getPositionFromFrame() : Position
+    + getFrameFromModel() : Frame
 }
 
-class streamResultHandler {
-    + handle(result: String)
-    + processStreamResult(streamResult: String)
+abstract class resolutionFixer {
+
 }
 
-class fileResultHandler {
+class StreamResultHandler {
     + handle(result: String)
-    + processFileResult(fileResult: String)
+    + getFrameFromStream(streamResult: String) : Frame
+    + getPositionFromFrame() : Position
+    + getFrameFromModel() : Frame
+}
+
+class FileResultHandler {
+    + handle(result: String)
+    + getFrameFromFile(fileResult: String) : Frame
+    + getPositionFromFrame() : Position
+    + getFrameFromModel() : Frame
 }
 
 abstract class Loader {
@@ -23,24 +38,24 @@ abstract class Loader {
     + load(url: String)
 }
 
-class loadStream {
+class StreamLoader {
     - stream_url : String
     + load(stream_url: String)
     + getStreamData() : String
     + streamType : String
 }
 
-class loadFile {
+class FileLoader {
     - file_path : String
     + load(file_path: String)
     + getFileData() : String
     + fileType : String
 }
 
-Loader <|-- loadFile : Inherits
-Loader <|-- loadStream : Inherits
+Loader <|-- FileLoader : Inherits
+Loader <|-- StreamLoader : Inherits
 
-Handler <|-- streamResultHandler : Inherits
-Handler <|-- fileResultHandler : Inherits
+Handler <|-- StreamResultHandler : Inherits
+Handler <|-- FileResultHandler : Inherits
 
 @enduml
