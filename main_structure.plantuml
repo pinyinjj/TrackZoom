@@ -5,25 +5,43 @@ entity Model
 entity Position
 
 
-Handler o-- Frame : has
-Handler o-- Model : has
-Handler o-- Position : has
+HandlerInterface o-- Frame : has
+HandlerInterface o-- Model : has
+HandlerInterface o-- Position : has
 
-abstract class Handler {
+abstract class HandlerInterface {
     + handle(result: String)
     + getPositionFromFrame() : Position
     + getFrameFromModel() : Frame
+    + saveFile() : None
 }
 
-abstract class resolutionFixer {
+abstract class ResolutionFixerInterface {
 
 }
+
+class ResolutionFixer {
+
+}
+
+ResolutionFixerInterface <|-- ResolutionFixer : Inherits
+
+abstract class UIInterface {
+    
+}
+
+class NiceGUI {
+
+}
+
+UIInterface <|.. NiceGUI : Inherits
 
 class StreamResultHandler {
     + handle(result: String)
     + getFrameFromStream(streamResult: String) : Frame
     + getPositionFromFrame() : Position
     + getFrameFromModel() : Frame
+    + saveFile() : None
 }
 
 class FileResultHandler {
@@ -31,9 +49,10 @@ class FileResultHandler {
     + getFrameFromFile(fileResult: String) : Frame
     + getPositionFromFrame() : Position
     + getFrameFromModel() : Frame
+    + saveFile() : None
 }
 
-abstract class Loader {
+abstract class LoaderInterface {
     - url : String
     + load(url: String)
 }
@@ -52,10 +71,26 @@ class FileLoader {
     + fileType : String
 }
 
-Loader <|-- FileLoader : Inherits
-Loader <|-- StreamLoader : Inherits
+StreamLoader o-- StreamResultHandler : uses
+FileLoader o-- FileResultHandler : uses
 
-Handler <|-- StreamResultHandler : Inherits
-Handler <|-- FileResultHandler : Inherits
+LoaderInterface <|.. FileLoader : implements
+LoaderInterface <|.. StreamLoader : implements
+HandlerInterface o-- ResolutionFixer : uses
+HandlerInterface <|.. StreamResultHandler : Inherits
+HandlerInterface <|.. FileResultHandler : Inherits
+
+NiceGUI *-- StreamLoader : uses
+NiceGUI *-- FileLoader : uses
+NiceGUI *-- ResolutionFixer : uses
+NiceGUI *-- StreamResultHandler : uses
+NiceGUI *-- FileResultHandler : uses
+
+
+
+
+
+
+
 
 @enduml
